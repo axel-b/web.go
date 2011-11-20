@@ -89,16 +89,19 @@ func (ctx *Context) ContentType(ext string) {
     }
 }
 
-//Sets a cookie -- duration is the amount of time in seconds. 0 = forever
+//Sets a cookie -- duration is the amount of time in seconds.
+// 0 = forever, persistent
+// <0 = omit expires attribute, i.e. expire at end of browser session
 func (ctx *Context) SetCookie(name string, value string, age int64) {
-    var utctime *time.Time
+    cookie := fmt.Sprintf("%s=%s", name, value)
     if age == 0 {
         // 2^31 - 1 seconds (roughly 2038)
-        utctime = time.SecondsToUTC(2147483647)
-    } else {
-        utctime = time.SecondsToUTC(time.UTC().Seconds() + age)
+        utctime := time.SecondsToUTC(2147483647)
+        cookie += fmt.Sprintf("; expires=%s", webTime(utctime))
+    } else if age > 0 {
+        utctime := time.SecondsToUTC(time.UTC().Seconds() + age)
+        cookie += fmt.Sprintf("; expires=%s", webTime(utctime))
     }
-    cookie := fmt.Sprintf("%s=%s; expires=%s", name, value, webTime(utctime))
     ctx.SetHeader("Set-Cookie", cookie, false)
 }
 
