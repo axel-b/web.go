@@ -102,6 +102,7 @@ func (ctx *Context) SetCookie(name string, value string, age int64) {
         utctime := time.SecondsToUTC(time.UTC().Seconds() + age)
         cookie += fmt.Sprintf("; expires=%s", webTime(utctime))
     }
+    cookie += fmt.Sprintf("; path=/")
     ctx.SetHeader("Set-Cookie", cookie, false)
 }
 
